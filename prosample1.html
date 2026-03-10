@@ -1,0 +1,249 @@
+<html>
+<head>
+<title>Alarm</title>
+<style>
+body {
+font-family: 'Segoe UI', sans-serif;
+background: linear-gradient(135deg, #667eea, #764ba2);
+color: #fff;
+display: flex;
+flex-direction: column;
+align-items: center;
+height: 100vh;
+padding: 0;
+margin: 0;
+}
+.nav {
+width: 100%;
+display: flex;
+justify-content: space-around;
+background: rgba(0, 0, 0, 0.2);
+13
+padding: 15px 0;
+backdrop-filter: blur(10px);
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.nav button {
+background: transparent;
+border: none;
+color: #fff;
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+padding: 10px 20px;
+}
+.nav button.active {
+border-bottom: 2px solid #fff;
+}
+.container {
+background: rgba(255, 255, 255, 0.1);
+border-radius: 16px;
+padding: 30px;
+width: 100%;
+max-width: 550px;
+backdrop-filter: blur(12px);
+box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+margin-top: 20px;
+}
+h2 {
+text-align: center;
+margin-bottom: 20px;
+}
+.input-group {
+display: flex;
+flex-direction: column;
+gap: 10px;
+7
+margin-bottom: 20px;
+}
+input[type="text"],
+input[type="time"] {
+padding: 12px;
+border: none;
+border-radius: 8px;
+font-size: 1rem;
+}
+button {
+padding: 10px;
+background: #00c6ff;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+color: white;
+font-weight: bold;
+margin-top: 10px;
+}
+.task {
+background: rgba(255,255,255,0.15);
+border-radius: 12px;
+padding: 15px;
+margin-bottom: 12px;
+display: flex;
+flex-direction: column;
+}
+.task-controls {
+display: flex;
+justify-content: space-between;
+margin-top: 10px;
+}
+.timer {
+font-size: 0.9em;
+color: #f0f0f0;
+margin-top: 5px;
+15
+}
+.completed {
+text-decoration: line-through;
+color: lightgreen;
+}
+.expired {
+color: red;
+}
+.tab {
+display: none;
+}
+.tab.active {
+display: block;
+}
+</style>
+</head>
+<body>
+<div class="nav">
+<button class="tab-btn active" onclick="location.href='home.html'">Home</button>
+<button class="tab-btn" onclick="switchTab('homeTab', this)">Alarm</button>
+<button class="tab-btn" onclick="location.href='timer.html'">Timer</button>
+<button class="tab-btn" onclick="location.href='stopwatch.html'">Stopwatch</button>
+</div>
+<div id="homeTab" class="tab container active">
+<h2> To-Do List</h2>
+<div class="input-group">
+<input type="text" id="taskInput" placeholder="Enter task..." />
+<input type="time" id="timeInput" />
+<button onclick="addTask()">Add Task</button>
+</div>
+<div id="taskList"></div>
+</div>
+<script>
+let tasks = JSON.parse(localStorage.getItem("todoTasks")) || [];
+7
+function saveTasks() {
+localStorage.setItem("todoTasks", JSON.stringify(tasks));
+}
+function playAlertSound() {
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+const oscillator = ctx.createOscillator();
+oscillator.type = "sine";
+oscillator.frequency.setValueAtTime(1000, ctx.currentTime);
+oscillator.connect(ctx.destination);
+oscillator.start();
+oscillator.stop(ctx.currentTime + 0.5);
+}
+function createCountdown(taskContent, timer, deadline, intervalStore) {
+if (intervalStore.value) clearInterval(intervalStore.value);
+intervalStore.value = setInterval(() => {
+const now = new Date();
+const diff = deadline - now;
+if (diff <= 0) {
+clearInterval(intervalStore.value);
+if (!taskContent.classList.contains("completed")) {
+taskContent.classList.add("expired");
+timer.textContent = " Time's up!";
+playAlertSound();
+}
+return;
+}
+const mins = Math.floor(diff / 60000);
+const secs = Math.floor((diff % 60000) / 1000);
+timer.textContent = ` ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} left`;
+}, 1000);
+}
+function addTask(fromStorage = false, storedText = "", storedTime = "") {
+const taskText = fromStorage ? storedText : document.getElementById("taskInput").value.trim();
+const timeInput = fromStorage ? storedTime : document.getElementById("timeInput").value;
+17
+if (!taskText || !timeInput) {
+if (!fromStorage) alert("Please enter a task and time.");
+return;
+}
+const now = new Date();
+const [hours, minutes] = timeInput.split(":").map(Number);
+const deadline = new Date();
+deadline.setHours(hours, minutes, 0, 0);
+if (deadline <= now && !fromStorage) {
+alert("Please set a future time.");
+return;
+}
+const task = document.createElement("div");
+task.className = "task";
+const taskContent = document.createElement("span");
+taskContent.textContent = taskText;
+const timer = document.createElement("span");
+timer.className = "timer";
+const intervalStore = { value: null };
+createCountdown(taskContent, timer, deadline, intervalStore);
+const controls = document.createElement("div");
+controls.className = "task-controls";
+const editBtn = document.createElement("button");
+editBtn.textContent = "Edit";
+editBtn.onclick = () => {
+document.getElementById("taskInput").value = taskContent.textContent;
+const hh = deadline.getHours().toString().padStart(2, "0");
+const mm = deadline.getMinutes().toString().padStart(2, "0");
+document.getElementById("timeInput").value = `${hh}:${mm}`;
+clearInterval(intervalStore.value);
+task.remove();
+tasks = tasks.filter(t => !(t.text === taskText && t.time === timeInput));
+saveTasks();
+};
+const doneBtn = document.createElement("button");
+doneBtn.textContent = "Done";
+doneBtn.onclick = () => {
+const now = new Date();
+if (now < deadline) {
+7
+taskContent.classList.add("completed");
+clearInterval(intervalStore.value);
+timer.textContent = " Completed on time!";
+} else {
+alert(" Time's up. Cannot mark as done.");
+}
+};
+const delBtn = document.createElement("button");
+delBtn.textContent = "Delete";
+delBtn.onclick = () => {
+clearInterval(intervalStore.value);
+task.remove();
+tasks = tasks.filter(t => !(t.text === taskText && t.time === timeInput));
+saveTasks();
+};
+controls.appendChild(editBtn);
+controls.appendChild(doneBtn);
+controls.appendChild(delBtn);
+task.appendChild(taskContent);
+task.appendChild(timer);
+task.appendChild(controls);
+document.getElementById("taskList").appendChild(task);
+if (!fromStorage) {
+tasks.push({ text: taskText, time: timeInput });
+saveTasks();
+}
+if (!fromStorage) {
+document.getElementById("taskInput").value = "";
+document.getElementById("timeInput").value = "";
+}
+}
+window.onload = () => {
+tasks.forEach(t => addTask(true, t.text, t.time));
+};
+function switchTab(tabId, btn) {
+document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+document.getElementById(tabId).classList.add('active');
+btn.classList.add('active');
+}
+</script>
+19
+</body>
+</html>
