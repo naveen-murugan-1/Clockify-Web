@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Timer</title>
+<style>
+body {
+font-family: 'Segoe UI', sans-serif;
+background: linear-gradient(135deg, #667eea, #764ba2);
+color: #fff;
+display: flex;
+flex-direction: column;
+align-items: center;
+height: 100vh;
+padding: 0;
+margin: 0;
+}
+.nav {
+width: 100%;
+display: flex;
+justify-content: space-around;
+background: rgba(0, 0, 0, 0.2);
+padding: 15px 0;
+backdrop-filter: blur(10px);
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.nav button {
+background: transparent;
+border: none;
+color: #fff;
+font-size: 1rem;
+font-weight: bold;
+7
+cursor: pointer;
+padding: 10px 20px;
+}
+.nav button.active {
+border-bottom: 2px solid #fff;
+}
+.container {
+background: rgba(255, 255, 255, 0.1);
+border-radius: 16px;
+padding: 30px;
+width: 100%;
+max-width: 500px;
+backdrop-filter: blur(12px);
+box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+margin-top: 40px;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+h1 {
+margin-bottom: 20px;
+}
+.timer-display {
+font-size: 4rem;
+margin: 20px 0;
+}
+.controls {
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+justify-content: center;
+}
+button {
+padding: 10px 20px;
+font-size: 1rem;
+21
+border: none;
+border-radius: 8px;
+cursor: pointer;
+background: #00c6ff;
+color: #fff;
+transition: background 0.3s;
+}
+button:hover {
+background: #008ecc;
+}
+input[type="number"] {
+width: 80px;
+padding: 10px;
+border-radius: 8px;
+border: none;
+text-align: center;
+font-size: 1rem;
+margin: 0 5px;
+}
+.input-group {
+display: flex;
+gap: 10px;
+margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+<div class="nav">
+<button class="tab-btn" onclick="location.href='home.html'">Home</button>
+<button class="tab-btn" onclick="location.href='prosample1.html'">Alaram</button>
+<button class="tab-btn active">Timer</button>
+<button class="tab-btn" onclick="location.href='stopwatch.html'">Stopwatch</button>
+</div>
+<div class="container">
+<h1> Simple Timer</h1>
+7
+<div class="input-group">
+<input type="number" id="minutes" placeholder="Min" min="0" />
+<input type="number" id="seconds" placeholder="Sec" min="0" max="59" />
+</div>
+<div class="timer-display" id="display">00:00</div>
+<div class="controls">
+<button onclick="startTimer()">Start</button>
+<button onclick="pauseTimer()">Pause</button>
+<button onclick="resetTimer()">Reset</button>
+</div>
+</div>
+<script>
+let totalSeconds = 0;
+let interval;
+function updateDisplay() {
+const mins = Math.floor(totalSeconds / 60);
+const secs = totalSeconds % 60;
+document.getElementById("display").textContent =
+`${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+function startTimer() {
+if (!interval) {
+const mins = parseInt(document.getElementById("minutes").value) || 0;
+const secs = parseInt(document.getElementById("seconds").value) || 0;
+if (totalSeconds === 0) {
+totalSeconds = mins * 60 + secs;
+}
+if (totalSeconds <= 0) {
+alert("Please enter a valid time.");
+return;
+}
+interval = setInterval(() => {
+if (totalSeconds <= 0) {
+23
+clearInterval(interval);
+interval = null;
+alert(" Time's up!");
+return;
+}
+totalSeconds--;
+updateDisplay();
+}, 1000);
+}
+}
+function pauseTimer() {
+clearInterval(interval);
+interval = null;
+}
+function resetTimer() {
+clearInterval(interval);
+interval = null;
+totalSeconds = 0;
+updateDisplay();
+document.getElementById("minutes").value = '';
+document.getElementById("seconds").value = '';
+}
+</script>
+</body>
+</html>
