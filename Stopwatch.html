@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stopwatch</title>
+<style>
+body {
+font-family: 'Segoe UI', sans-serif;
+background: linear-gradient(135deg, #667eea, #764ba2);
+color: #fff;
+margin: 0;
+padding: 0;
+7
+height: 100vh;
+display: flex;
+flex-direction: column;
+}
+.nav {
+width: 100%;
+display: flex;
+justify-content: space-around;
+background: rgba(0, 0, 0, 0.2);
+padding: 15px 0;
+backdrop-filter: blur(10px);
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.nav button {
+background: transparent;
+border: none;
+color: #fff;
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+padding: 10px 20px;
+}
+.nav button.active {
+border-bottom: 2px solid #fff;
+}
+.tab {
+display: none;
+flex-grow: 1;
+padding: 20px;
+display: flex;
+justify-content: center;
+align-items: flex-start;
+}
+.tab.active {
+25
+display: flex;
+}
+.container {
+background: rgba(255, 255, 255, 0.1);
+border-radius: 16px;
+padding: 30px;
+width: 100%;
+max-width: 550px;
+backdrop-filter: blur(12px);
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+margin-top: 20px;
+}
+.stopwatch-display {
+font-size: 4rem;
+margin: 20px 0;
+}
+.controls {
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+justify-content: center;
+}
+button.control-btn {
+padding: 10px 20px;
+font-size: 1rem;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+background: #00c6ff;
+color: #fff;
+transition: background 0.3s;
+}
+button.control-btn:hover {
+background: #008ecc;
+}
+7
+.laps {
+margin-top: 20px;
+width: 100%;
+max-height: 200px;
+overflow-y: auto;
+}
+.lap {
+background: rgba(255, 255, 255, 0.15);
+border-radius: 8px;
+padding: 10px;
+margin: 5px 0;
+font-size: 1rem;
+color: #e0e0e0;
+}
+</style>
+</head>
+<body>
+<div class="nav">
+<button class="tab-btn" onclick="location.href='home.html'">Home</button>
+<button class="tab-btn" onclick="location.href='prosample1.html'">Alarm</button>
+<button class="tab-btn" onclick="location.href='timer.html'">Timer</button>
+<button class="tab-btn active" onclick="switchTab('stopwatchTab', this)">Stopwatch</button>
+</div>
+<div id="stopwatchTab" class="tab active">
+<div class="container">
+<h1>⏲ Stopwatch</h1>
+<div class="stopwatch-display" id="stopwatch">00:00:00</div>
+<div class="controls">
+<button class="control-btn" onclick="startStopwatch()">Start</button>
+<button class="control-btn" onclick="pauseStopwatch()">Pause</button>
+<button class="control-btn" onclick="resetStopwatch()">Reset</button>
+<button class="control-btn" onclick="recordLap()">Lap</button>
+</div>
+<div class="laps" id="laps"></div>
+</div>
+</div>
+<script>
+function switchTab(tabId, btn) {
+27
+document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+document.getElementById(tabId).classList.add('active');
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+}
+let stopwatchTime = 0;
+let interval = null;
+function updateStopwatchDisplay() {
+const hours = Math.floor(stopwatchTime / 3600);
+const minutes = Math.floor((stopwatchTime % 3600) / 60);
+const seconds = stopwatchTime % 60;
+document.getElementById("stopwatch").textContent =
+`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+function startStopwatch() {
+if (!interval) {
+interval = setInterval(() => {
+stopwatchTime++;
+updateStopwatchDisplay();
+}, 1000);
+}
+}
+function pauseStopwatch() {
+clearInterval(interval);
+interval = null;
+}
+function resetStopwatch() {
+pauseStopwatch();
+stopwatchTime = 0;
+updateStopwatchDisplay();
+document.getElementById("laps").innerHTML = "";
+}
+function recordLap() {
+const lapTime = document.getElementById("stopwatch").textContent;
+7
+const lap = document.createElement("div");
+lap.className = "lap";
+lap.textContent = `Lap: ${lapTime}`;
+document.getElementById("laps").appendChild(lap);
+}
+updateStopwatchDisplay();
+</script>
+</body>
+</html>
