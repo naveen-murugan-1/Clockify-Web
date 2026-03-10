@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>Home</title>
+<style>
+body {
+font-family: 'Segoe UI', sans-serif;
+background: linear-gradient(135deg, #667eea, #764ba2);
+color: #fff;
+display: flex;
+flex-direction: column;
+align-items: center;
+height: 100vh;
+margin: 0;
+padding: 0;
+}
+.nav {
+width: 100%;
+display: flex;
+justify-content: space-around;
+background: rgba(0, 0, 0, 0.2);
+padding: 15px 0;
+backdrop-filter: blur(10px);
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.nav button {
+background: transparent;
+border: none;
+color: #fff;
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+padding: 10px 20px;
+}
+9
+.nav button.active {
+border-bottom: 2px solid #fff;
+}
+.clock-container {
+background: rgba(255, 255, 255, 0.1);
+border-radius: 16px;
+padding: 30px;
+width: 100%;
+max-width: 400px;
+backdrop-filter: blur(12px);
+box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+margin-top: 30px;
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+}
+.toggle-btn {
+margin: 20px;
+padding: 10px 20px;
+font-size: 16px;
+background: #00c6ff;
+border: none;
+color: white;
+cursor: pointer;
+border-radius: 8px;
+font-weight: bold;
+}
+.digital-clock {
+font-size: 48px;
+display: none;
+margin-top: 10px;
+}
+.analog-clock {
+position: relative;
+width: 200px;
+7
+height: 200px;
+border: 8px solid white;
+border-radius: 50%;
+display: none;
+margin-top: 10px;
+}
+.hand {
+position: absolute;
+bottom: 50%;
+left: 50%;
+transform-origin: bottom;
+transform: translateX(-50%);
+background: white;
+}
+.hour {
+height: 50px;
+width: 6px;
+background: #f0a;
+}
+.minute {
+height: 70px;
+width: 4px;
+background: #0af;
+}
+.second {
+height: 90px;
+width: 2px;
+background: red;
+}
+.center-dot {
+position: absolute;
+width: 12px;
+height: 12px;
+background: white;
+border-radius: 50%;
+top: 50%;
+11
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 10;
+}
+</style>
+</head>
+<body>
+<div class="nav">
+<button class="tab-btn active" onclick="location.href='home.html'">Home</button>
+<button class="tab-btn" onclick="location.href='prosample1.html'">Alarm</button>
+<button class="tab-btn" onclick="location.href='timer.html'">Timer</button>
+<button class="tab-btn" onclick="location.href='stopwatch.html'">Stopwatch</button>
+</div>
+<div class="clock-container">
+<button class="toggle-btn" onclick="toggleClock()">Toggle Analog/Digital</button>
+<div class="digital-clock" id="digitalClock"></div>
+<div class="analog-clock" id="analogClock">
+<div class="hand hour" id="hourHand"></div>
+<div class="hand minute" id="minuteHand"></div>
+<div class="hand second" id="secondHand"></div>
+<div class="center-dot"></div>
+</div>
+</div>
+<script>
+let showAnalog = false;
+function toggleClock() {
+showAnalog = !showAnalog;
+document.getElementById('analogClock').style.display = showAnalog ? 'block' : 'none';
+document.getElementById('digitalClock').style.display = showAnalog ? 'none' : 'block';
+}
+function updateClocks() {
+const now = new Date();
+const h = now.getHours();
+const m = now.getMinutes();
+const s = now.getSeconds();
+document.getElementById('digitalClock').textContent =
+`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+7
+const hourDeg = ((h % 12) + m / 60) * 30;
+const minuteDeg = (m + s / 60) * 6;
+const secondDeg = s * 6;
+document.getElementById('hourHand').style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+document.getElementById('minuteHand').style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+document.getElementById('secondHand').style.transform = `translateX(-50%) rotate(${secondDeg}deg)`;
+}
+toggleClock();
+setInterval(updateClocks, 1000);
+updateClocks();
+</script>
+</body>
+</html>
